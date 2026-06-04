@@ -4,95 +4,152 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TecnoPlus | SIGC</title>
+    <!-- Fuente Inter - La más profesional para Software -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png">
+    
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #f4f7f6; font-family: sans-serif; }
+        :root {
+            --primary: #004687;
+            --accent: #00a8e8;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+        }
         
+        /* Contenedor de Carga Estilo Moderno */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; z-index: 9999;
+            background: var(--bg-gradient);
         }
 
-        .spinner {
-            width: 50px; height: 50px; border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db; border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 20px;
+        .loader-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 40px 60px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.4);
+            text-align: center;
         }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .logo {
+            width: 130px; margin-bottom: 25px;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+            animation: pulse 2s infinite ease-in-out;
+        }
 
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        /* Barra de progreso elegante */
+        .progress-container {
+            width: 200px; height: 6px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            animation: load 3s ease-in-out forwards;
+        }
+
+        @keyframes load {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        #msg {
+            color: #444; font-size: 14px; font-weight: 500;
+            margin: 0; letter-spacing: 0.5px;
+        }
+
+        /* Iframe con compensación para ocultar franja de Google */
         iframe {
             position: absolute;
-            /* Ocultamos la franja de Google */
-            top: 0; 
+            top: -48px; /* Mantiene la franja oculta */
             left: 0;
             width: 100%;
-            height: calc(100%);
+            height: calc(100% + 48px);
             border: none;
             display: none;
         }
+
+        .error-msg { color: #d32f2f; font-weight: 600; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png" width="120" style="margin-bottom: 20px;">
-        <div class="spinner"></div>
-        <p id="msg">Iniciando TecnoPlus SIGC...</p>
+        <div class="loader-card">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png" class="logo">
+            
+            <p id="msg">Iniciando TecnoPlus SIGC...</p>
+            
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
     </div>
 
     <iframe id="app_frame" src="" allow="geolocation; microphone; camera; clipboard-write;"></iframe>
 
     <script>
-        async function bootstrap() {
-            // 1. LINK DE TU CSV (El mismo que usaste en Odoo)
-            const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRMXgT2SYdDz2xBBUDP5eJ2gqMmee6qAQRk73xWMpZIyZ8jSdUucxVcnCIChlqGDKEutyej1CGps1k9/pub?gid=0&single=true&output=csv";
-            
-            const params = new URLSearchParams(window.location.search);
-            const clienteID = params.get('c');
+    async function bootstrap() {
+        // 1. URL DE TU PORTERO (La que acabas de copiar)
+        const GATEWAY_URL = "https://script.google.com/macros/s/AKfycbwRcaHS3ImzpwYQHJ-bQd0oVtl-0tTrVQwKgXTOwNosR-du2cUYjGFGAwzJMwfIIc2J/exec";
+        const MI_CLAVE = "Cccl30p4tr4"; // Debe ser igual a la del script
+        
+        const params = new URLSearchParams(window.location.search);
+        const clienteID = params.get('c');
 
-            if (!clienteID) {
-                document.getElementById('msg').innerHTML = "<b style='color:red;'>Error: ID de cliente faltante.</b>";
-                document.querySelector('.spinner').style.display = "none";
+        if (!clienteID) {
+            document.getElementById('msg').innerHTML = "<span style='color:red;'>ID de cliente faltante.</span>";
+            return;
+        }
+
+        try {
+            // Llamamos al portero de forma privada
+            const response = await fetch(`${GATEWAY_URL}?c=${clienteID}&key=${MI_CLAVE}`);
+            const res = await response.json();
+
+            if (res.error) {
+                document.getElementById('msg').innerHTML = `<span style='color:red;'>${res.error}</span>`;
                 return;
             }
 
-            try {
-                // El Date.now evita que el navegador guarde una versión vieja del Excel
-                const response = await fetch(CSV_URL + "&t=" + Date.now());
-                const text = await response.text();
-                const rows = text.split('\n');
-
-                let urlFinal = "";
-                let estado = "";
-
-                for (let i = 1; i < rows.length; i++) {
-                    const cols = rows[i].split(',');
-                    if (cols[0] && cols[0].trim().toUpperCase() === clienteID.toUpperCase()) {
-                        estado = cols[5].trim().toUpperCase(); // Columna F
-                        urlFinal = cols[6].trim();            // Columna G
-                        break;
-                    }
-                }
-
-                if (estado === "ACTIVA" && urlFinal) {
-                    const frame = document.getElementById('app_frame');
-                    frame.src = urlFinal;
-                    frame.onload = () => {
+            if (res.status === "ACTIVA" && res.url) {
+                const frame = document.getElementById('app_frame');
+                frame.src = res.url;
+                frame.onload = () => {
+                    setTimeout(() => {
                         frame.style.display = "block";
-                        document.getElementById('loader').style.display = "none";
-                    };
-                } else {
-                    document.getElementById('msg').innerHTML = "<b style='color:red;'>Acceso Denegado o Cliente No Registrado.</b>";
-                    document.querySelector('.spinner').style.display = "none";
-                }
-            } catch (e) {
-                document.getElementById('msg').innerHTML = "Error de conexión.";
+                        document.getElementById('loader').style.opacity = "0";
+                        setTimeout(() => document.getElementById('loader').style.display = "none", 500);
+                    }, 500);
+                };
+            } else {
+                document.getElementById('msg').innerHTML = "<span style='color:red;'>Suscripción Suspendida.</span>";
             }
+        } catch (e) {
+            document.getElementById('msg').innerHTML = "Error de Seguridad.";
         }
+    }
 
-        bootstrap();
-    </script>
+    bootstrap();
+</script>
 </body>
 </html>
