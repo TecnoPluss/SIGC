@@ -109,10 +109,7 @@
 
     <script>
     async function bootstrap() {
-        // 1. URL DE TU PORTERO (La que acabas de copiar)
-        const GATEWAY_URL = "https://script.google.com/macros/s/AKfycbwRcaHS3ImzpwYQHJ-bQd0oVtl-0tTrVQwKgXTOwNosR-du2cUYjGFGAwzJMwfIIc2J/exec";
-        const MI_CLAVE = "Cccl30p4tr4"; // Debe ser igual a la del script
-        
+        // Obtenemos el cliente de la URL (?c=Pruebas)
         const params = new URLSearchParams(window.location.search);
         const clienteID = params.get('c');
 
@@ -122,18 +119,14 @@
         }
 
         try {
-            // Llamamos al portero de forma privada
-            const response = await fetch(`${GATEWAY_URL}?c=${clienteID}&key=${MI_CLAVE}`);
-            const res = await response.json();
+            // CARGA ULTRA RÁPIDA: Leemos el archivo JSON local
+            const response = await fetch('config.json?v=' + Date.now());
+            const config = await response.json();
+            const cliente = config[clienteID.toUpperCase()];
 
-            if (res.error) {
-                document.getElementById('msg').innerHTML = `<span style='color:red;'>${res.error}</span>`;
-                return;
-            }
-
-            if (res.status === "ACTIVA" && res.url) {
+            if (cliente && cliente.s === "ACTIVA") {
                 const frame = document.getElementById('app_frame');
-                frame.src = res.url;
+                frame.src = cliente.u; // Cargamos la URL del /exec
                 frame.onload = () => {
                     setTimeout(() => {
                         frame.style.display = "block";
@@ -141,11 +134,13 @@
                         setTimeout(() => document.getElementById('loader').style.display = "none", 500);
                     }, 500);
                 };
-            } else {
+            } else if (cliente && cliente.s === "INACTIVA") {
                 document.getElementById('msg').innerHTML = "<span style='color:red;'>Suscripción Suspendida.</span>";
+            } else {
+                document.getElementById('msg').innerHTML = "<span style='color:red;'>Cliente no registrado.</span>";
             }
         } catch (e) {
-            document.getElementById('msg').innerHTML = "Error de Seguridad.";
+            document.getElementById('msg').innerHTML = "Error de Sistema.";
         }
     }
 
