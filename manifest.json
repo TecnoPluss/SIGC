@@ -1,0 +1,16 @@
+{
+  "name": "TecnoPlus SIGC",
+  "short_name": "TecnoPlus",
+  "description": "Sistema Integral de Gestión Comercial",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#004687",
+  "icons": [
+    {
+      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
