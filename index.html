@@ -145,6 +145,32 @@
     }
 
     bootstrap();
+        
+// ESCUCHADOR DE ÓRDENES DESDE EL POS (IFRAME)
+window.addEventListener("message", function(event) {
+    if (event.data && event.data.tipo === 'COMANDO_IMPRIMIR_APK') {
+        console.log("Recibida orden de impresión del POS, pasando al celular...");
+        
+        // 1. Cambiamos visualmente la pantalla de GitHub por el ticket
+        const loader = document.getElementById('loader');
+        const frame = document.getElementById('app_frame');
+        
+        // Guardamos el POS, mostramos solo el ticket
+        const bodyOriginal = document.body.innerHTML;
+        document.body.innerHTML = event.data.ticket;
+
+        // 2. Llamamos al puente de Android que creamos en Java
+        if (typeof AndroidImpresora !== "undefined") {
+            AndroidImpresora.ejecutarImpresion();
+        }
+
+        // 3. Restauramos el sistema después de 3 segundos
+        setTimeout(() => {
+            location.reload(); 
+        }, 3000);
+    }
+});
+        
 </script>
 </body>
 </html>
