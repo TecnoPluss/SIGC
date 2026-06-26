@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1280, initial-scale=0.4, user-scalable=yes">
     <title>TecnoPlus | SIGC</title>
-    <!-- Fuente Inter - La más profesional para Software -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png">
     
@@ -21,7 +20,6 @@
             background: var(--bg-gradient);
         }
         
-        /* Contenedor de Carga Estilo Moderno */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center;
@@ -51,7 +49,6 @@
             100% { transform: scale(1); }
         }
 
-        /* Barra de progreso elegante */
         .progress-container {
             width: 200px; height: 6px;
             background: rgba(0,0,0,0.05);
@@ -77,10 +74,9 @@
             margin: 0; letter-spacing: 0.5px;
         }
 
-        /* Iframe con compensación para ocultar franja de Google */
         iframe {
             position: absolute;
-            top: 0; /* Mantiene la franja oculta */
+            top: 0;
             left: 0;
             width: 100%;
             height: calc(100%);
@@ -109,7 +105,6 @@
 
     <script>
     async function bootstrap() {
-        // Obtenemos el cliente de la URL (?c=Pruebas)
         const params = new URLSearchParams(window.location.search);
         const clienteID = params.get('c');
 
@@ -119,14 +114,13 @@
         }
 
         try {
-            // CARGA ULTRA RÁPIDA: Leemos el archivo JSON local
             const response = await fetch('config.json?v=' + Date.now());
             const config = await response.json();
             const cliente = config[clienteID.toUpperCase()];
 
             if (cliente && cliente.s === "ACTIVA") {
                 const frame = document.getElementById('app_frame');
-                frame.src = cliente.u; // Cargamos la URL del /exec
+                frame.src = cliente.u;
                 frame.onload = () => {
                     setTimeout(() => {
                         frame.style.display = "block";
@@ -146,31 +140,38 @@
 
     bootstrap();
         
-// ESCUCHADOR DE ÓRDENES DESDE EL POS (IFRAME)
-window.addEventListener("message", function(event) {
-    if (event.data && event.data.tipo === 'COMANDO_IMPRIMIR_APK') {
-        console.log("Recibida orden de impresión del POS, pasando al celular...");
-        
-        // 1. Cambiamos visualmente la pantalla de GitHub por el ticket
-        const loader = document.getElementById('loader');
-        const frame = document.getElementById('app_frame');
-        
-        // Guardamos el POS, mostramos solo el ticket
-        const bodyOriginal = document.body.innerHTML;
-        document.body.innerHTML = event.data.ticket;
+    // ESCUCHADOR DE ÓRDENES DESDE EL POS (IFRAME)
+    window.addEventListener("message", function(event) {
+        if (event.data && event.data.tipo === 'COMANDO_IMPRIMIR_APK') {
+            console.log("Recibida orden de impresión del POS...");
 
-        // 2. Llamamos al puente de Android que creamos en Java
-        if (typeof AndroidImpresora !== "undefined") {
-            AndroidImpresora.ejecutarImpresion();
+            const htmlTicket = event.data.ticket;
+
+            // ★ CASO 1: Windows (.exe con WebView2) — abre ventana e imprime
+            if (window.chrome && window.chrome.webview) {
+                var w = window.open('', '_blank', 'width=800,height=600');
+                w.document.open();
+                w.document.write(htmlTicket);
+                w.document.close();
+                w.focus();
+                w.print();
+                return; // No seguir al bloque de Android
+            }
+
+            // CASO 2: Android (comportamiento original sin cambios)
+            const bodyOriginal = document.body.innerHTML;
+            document.body.innerHTML = htmlTicket;
+
+            if (typeof AndroidImpresora !== "undefined") {
+                AndroidImpresora.ejecutarImpresion();
+            }
+
+            setTimeout(() => {
+                location.reload(); 
+            }, 3000);
         }
-
-        // 3. Restauramos el sistema después de 3 segundos
-        setTimeout(() => {
-            location.reload(); 
-        }, 3000);
-    }
-});
+    });
         
-</script>
+    </script>
 </body>
 </html>
