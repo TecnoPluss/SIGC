@@ -2,8 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1280, initial-scale=0.4, user-scalable=yes">
+    <!-- MODIFICACIÓN: Viewport ajustado a 1024 para alejar el zoom en móviles y permitir scroll -->
+    <meta name="viewport" content="width=1024, initial-scale=1.0, user-scalable=yes">
     <title>TecnoPlus | SIGC</title>
+    
+    <!-- MODIFICACIÓN: Soporte para instalación en iPhone y Android (PWA) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TecnoPlus">
+    <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png">
+
+    <!-- Fuente Inter - La más profesional para Software -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png">
     
@@ -20,11 +30,13 @@
             background: var(--bg-gradient);
         }
         
+        /* Contenedor de Carga Estilo Moderno */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; z-index: 9999;
             background: var(--bg-gradient);
+            transition: opacity 0.5s ease; /* Suavizado al desaparecer */
         }
 
         .loader-card {
@@ -49,6 +61,7 @@
             100% { transform: scale(1); }
         }
 
+        /* Barra de progreso elegante */
         .progress-container {
             width: 200px; height: 6px;
             background: rgba(0,0,0,0.05);
@@ -74,29 +87,15 @@
             margin: 0; letter-spacing: 0.5px;
         }
 
+        /* Iframe con compensación para ocultar franja de Google */
         iframe {
             position: absolute;
-            top: 0;
+            top: 0; 
             left: 0;
             width: 100%;
-            height: calc(100%);
+            height: 100%;
             border: none;
             display: none;
-        }
-
-        /* Contenedor oculto donde se inyecta el ticket para imprimir en Windows */
-        #print-container {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 99999;
-            background: white;
-        }
-
-        @media print {
-            #loader, iframe { display: none !important; }
-            #print-container { display: block !important; }
         }
 
         .error-msg { color: #d32f2f; font-weight: 600; }
@@ -106,8 +105,11 @@
 
     <div id="loader">
         <div class="loader-card">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png" class="logo">
+            <!-- MODIFICACIÓN: Se añade id="main_logo" para hacerlo dinámico -->
+            <img id="main_logo" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png" class="logo">
+            
             <p id="msg">Iniciando TecnoPlus SIGC...</p>
+            
             <div class="progress-container">
                 <div class="progress-bar"></div>
             </div>
@@ -116,11 +118,25 @@
 
     <iframe id="app_frame" src="" allow="geolocation; microphone; camera; clipboard-write;"></iframe>
 
-    <!-- Contenedor para impresión en Windows (invisible hasta imprimir) -->
-    <div id="print-container"></div>
-
     <script>
+    // MODIFICACIÓN: Registro de Service Worker para PWA (iOS/Android)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+
+    // MODIFICACIÓN: Puente para recibir ventas del computador (Offline Sync)
+    function recibirVentaDesdeEXE(datosVenta) {
+        const frame = document.getElementById('app_frame');
+        if (frame.contentWindow) {
+            frame.contentWindow.postMessage({
+                tipo: 'SYNC_OFFLINE_SALE',
+                data: datosVenta
+            }, '*');
+        }
+    }
+
     async function bootstrap() {
+        // Obtenemos el cliente de la URL (?c=Pruebas)
         const params = new URLSearchParams(window.location.search);
         const clienteID = params.get('c');
 
@@ -130,13 +146,20 @@
         }
 
         try {
+            // CARGA ULTRA RÁPIDA: Leemos el archivo JSON local
             const response = await fetch('config.json?v=' + Date.now());
             const config = await response.json();
+
+            // MODIFICACIÓN: Aplicar Logo Dinámico Global si existe en el JSON
+            if (config._CONFIG_GLOBAL_ && config._CONFIG_GLOBAL_.logo) {
+                document.getElementById('main_logo').src = config._CONFIG_GLOBAL_.logo;
+            }
+
             const cliente = config[clienteID.toUpperCase()];
 
             if (cliente && cliente.s === "ACTIVA") {
                 const frame = document.getElementById('app_frame');
-                frame.src = cliente.u;
+                frame.src = cliente.u; // Cargamos la URL del /exec
                 frame.onload = () => {
                     setTimeout(() => {
                         frame.style.display = "block";
@@ -155,42 +178,6 @@
     }
 
     bootstrap();
-        
-    // ESCUCHADOR DE ÓRDENES DESDE EL POS (IFRAME)
-    window.addEventListener("message", function(event) {
-        if (event.data && event.data.tipo === 'COMANDO_IMPRIMIR_APK') {
-            console.log("Recibida orden de impresión del POS...");
-
-            var htmlTicket = event.data.ticket;
-
-            // ★ CASO WINDOWS (.exe con WebView2)
-            // Inyectamos el ticket en el div oculto y llamamos window.print()
-            // Esto evita window.open() que es bloqueado por WebView2 cross-origin
-            if (window.chrome && window.chrome.webview) {
-                var container = document.getElementById('print-container');
-                container.innerHTML = htmlTicket;
-                window.print();
-                // Limpiar después de imprimir
-                setTimeout(function() {
-                    container.innerHTML = '';
-                }, 2000);
-                return; // No ejecutar el bloque de Android
-            }
-
-            // CASO ANDROID (comportamiento original sin ningún cambio)
-            var bodyOriginal = document.body.innerHTML;
-            document.body.innerHTML = htmlTicket;
-
-            if (typeof AndroidImpresora !== "undefined") {
-                AndroidImpresora.ejecutarImpresion();
-            }
-
-            setTimeout(() => {
-                location.reload(); 
-            }, 3000);
-        }
-    });
-        
-    </script>
+</script>
 </body>
 </html>
