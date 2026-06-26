@@ -84,6 +84,21 @@
             display: none;
         }
 
+        /* Contenedor oculto donde se inyecta el ticket para imprimir en Windows */
+        #print-container {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 99999;
+            background: white;
+        }
+
+        @media print {
+            #loader, iframe { display: none !important; }
+            #print-container { display: block !important; }
+        }
+
         .error-msg { color: #d32f2f; font-weight: 600; }
     </style>
 </head>
@@ -92,9 +107,7 @@
     <div id="loader">
         <div class="loader-card">
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png" class="logo">
-            
             <p id="msg">Iniciando TecnoPlus SIGC...</p>
-            
             <div class="progress-container">
                 <div class="progress-bar"></div>
             </div>
@@ -102,6 +115,9 @@
     </div>
 
     <iframe id="app_frame" src="" allow="geolocation; microphone; camera; clipboard-write;"></iframe>
+
+    <!-- Contenedor para impresión en Windows (invisible hasta imprimir) -->
+    <div id="print-container"></div>
 
     <script>
     async function bootstrap() {
@@ -145,21 +161,24 @@
         if (event.data && event.data.tipo === 'COMANDO_IMPRIMIR_APK') {
             console.log("Recibida orden de impresión del POS...");
 
-            const htmlTicket = event.data.ticket;
+            var htmlTicket = event.data.ticket;
 
-            // ★ CASO 1: Windows (.exe con WebView2) — abre ventana e imprime
+            // ★ CASO WINDOWS (.exe con WebView2)
+            // Inyectamos el ticket en el div oculto y llamamos window.print()
+            // Esto evita window.open() que es bloqueado por WebView2 cross-origin
             if (window.chrome && window.chrome.webview) {
-                var w = window.open('', '_blank', 'width=800,height=600');
-                w.document.open();
-                w.document.write(htmlTicket);
-                w.document.close();
-                w.focus();
-                w.print();
-                return; // No seguir al bloque de Android
+                var container = document.getElementById('print-container');
+                container.innerHTML = htmlTicket;
+                window.print();
+                // Limpiar después de imprimir
+                setTimeout(function() {
+                    container.innerHTML = '';
+                }, 2000);
+                return; // No ejecutar el bloque de Android
             }
 
-            // CASO 2: Android (comportamiento original sin cambios)
-            const bodyOriginal = document.body.innerHTML;
+            // CASO ANDROID (comportamiento original sin ningún cambio)
+            var bodyOriginal = document.body.innerHTML;
             document.body.innerHTML = htmlTicket;
 
             if (typeof AndroidImpresora !== "undefined") {
