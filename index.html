@@ -4,33 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1280, initial-scale=0.4, user-scalable=yes">
     <title>TecnoPlus | SIGC</title>
+    <!-- Fuente Inter - La más profesional para Software -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png">
-
+    
     <style>
         :root {
             --primary: #004687;
-            --accent:  #00a8e8;
+            --accent: #00a8e8;
             --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
 
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
             overflow: hidden; font-family: 'Inter', sans-serif;
             background: var(--bg-gradient);
         }
-
-        /* ── Loader ─────────────────────────────────────────── */
+        
+        /* Contenedor de Carga Estilo Moderno */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; z-index: 9999;
             background: var(--bg-gradient);
-            transition: opacity 0.5s ease;
         }
 
         .loader-card {
-            background: rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             padding: 40px 60px;
             border-radius: 24px;
@@ -46,11 +46,12 @@
         }
 
         @keyframes pulse {
-            0%   { transform: scale(1);    }
-            50%  { transform: scale(1.03); }
-            100% { transform: scale(1);    }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
         }
 
+        /* Barra de progreso elegante */
         .progress-container {
             width: 200px; height: 6px;
             background: rgba(0,0,0,0.05);
@@ -67,7 +68,7 @@
         }
 
         @keyframes load {
-            0%   { width: 0%;   }
+            0% { width: 0%; }
             100% { width: 100%; }
         }
 
@@ -76,14 +77,18 @@
             margin: 0; letter-spacing: 0.5px;
         }
 
-        /* ── App frame ───────────────────────────────────────── */
+        /* Iframe con compensación para ocultar franja de Google */
         iframe {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0; /* Mantiene la franja oculta */
+            left: 0;
+            width: 100%;
+            height: calc(100%);
             border: none;
             display: none;
         }
+
+        .error-msg { color: #d32f2f; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -91,7 +96,9 @@
     <div id="loader">
         <div class="loader-card">
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png" class="logo">
+            
             <p id="msg">Iniciando TecnoPlus SIGC...</p>
+            
             <div class="progress-container">
                 <div class="progress-bar"></div>
             </div>
@@ -101,44 +108,36 @@
     <iframe id="app_frame" src="" allow="geolocation; microphone; camera; clipboard-write;"></iframe>
 
     <script>
-    /* ══════════════════════════════════════════════════════════
-       BOOTSTRAP — carga el POS según config.json
-    ══════════════════════════════════════════════════════════ */
     async function bootstrap() {
-        const params    = new URLSearchParams(window.location.search);
+        // Obtenemos el cliente de la URL (?c=Pruebas)
+        const params = new URLSearchParams(window.location.search);
         const clienteID = params.get('c');
 
         if (!clienteID) {
-            document.getElementById('msg').innerHTML =
-                "<span style='color:red;'>ID de cliente faltante.</span>";
+            document.getElementById('msg').innerHTML = "<span style='color:red;'>ID de cliente faltante.</span>";
             return;
         }
 
         try {
+            // CARGA ULTRA RÁPIDA: Leemos el archivo JSON local
             const response = await fetch('config.json?v=' + Date.now());
-            const config   = await response.json();
-            const cliente  = config[clienteID.toUpperCase()];
+            const config = await response.json();
+            const cliente = config[clienteID.toUpperCase()];
 
             if (cliente && cliente.s === "ACTIVA") {
                 const frame = document.getElementById('app_frame');
-                frame.src   = cliente.u;
-
+                frame.src = cliente.u; // Cargamos la URL del /exec
                 frame.onload = () => {
                     setTimeout(() => {
                         frame.style.display = "block";
                         document.getElementById('loader').style.opacity = "0";
-                        setTimeout(() =>
-                            document.getElementById('loader').style.display = "none"
-                        , 500);
+                        setTimeout(() => document.getElementById('loader').style.display = "none", 500);
                     }, 500);
                 };
-
             } else if (cliente && cliente.s === "INACTIVA") {
-                document.getElementById('msg').innerHTML =
-                    "<span style='color:red;'>Suscripción Suspendida.</span>";
+                document.getElementById('msg').innerHTML = "<span style='color:red;'>Suscripción Suspendida.</span>";
             } else {
-                document.getElementById('msg').innerHTML =
-                    "<span style='color:red;'>Cliente no registrado.</span>";
+                document.getElementById('msg').innerHTML = "<span style='color:red;'>Cliente no registrado.</span>";
             }
         } catch (e) {
             document.getElementById('msg').innerHTML = "Error de Sistema.";
@@ -146,56 +145,32 @@
     }
 
     bootstrap();
+        
+// ESCUCHADOR DE ÓRDENES DESDE EL POS (IFRAME)
+window.addEventListener("message", function(event) {
+    if (event.data && event.data.tipo === 'COMANDO_IMPRIMIR_APK') {
+        console.log("Recibida orden de impresión del POS, pasando al celular...");
+        
+        // 1. Cambiamos visualmente la pantalla de GitHub por el ticket
+        const loader = document.getElementById('loader');
+        const frame = document.getElementById('app_frame');
+        
+        // Guardamos el POS, mostramos solo el ticket
+        const bodyOriginal = document.body.innerHTML;
+        document.body.innerHTML = event.data.ticket;
 
-
-    /* ══════════════════════════════════════════════════════════
-       PUENTE DE IMPRESIÓN
-       — Recibe el comando del POS (iframe hijo)
-       — Decide si está corriendo en el EXE (WebView2) o en la APK Android
-    ══════════════════════════════════════════════════════════ */
-    window.addEventListener("message", function(event) {
-
-        // Filtramos solo el comando de impresión
-        if (!event.data || event.data.tipo !== 'COMANDO_IMPRIMIR_APK') return;
-
-        const ticketHtml = event.data.ticket || "";
-
-        /* ── Rama EXE (WebView2) ────────────────────────────── */
-        if (window.chrome && window.chrome.webview) {
-            // Enviamos el ticket al C# que lo imprimirá en Windows
-            window.chrome.webview.postMessage(JSON.stringify({
-                tipo:   "IMPRIMIR",
-                ticket: ticketHtml
-            }));
-            return;  // No continuar con la lógica Android
-        }
-
-        /* ── Rama APK Android ──────────────────────────────── */
-        // Reemplazamos el DOM con el ticket para que la vista previa sea visible
-        document.body.innerHTML = ticketHtml;
-
+        // 2. Llamamos al puente de Android que creamos en Java
         if (typeof AndroidImpresora !== "undefined") {
             AndroidImpresora.ejecutarImpresion();
         }
 
-        // Restaurar el sistema tras 3 segundos
-        setTimeout(() => { location.reload(); }, 3000);
-    });
-
-
-    /* ══════════════════════════════════════════════════════════
-       FUNCIÓN PÚBLICA — permite al EXE reenviar ventas offline
-       que guardó en disco mientras no había internet
-    ══════════════════════════════════════════════════════════ */
-    function recibirVentaDesdeEXE(ventaObj) {
-        const frame = document.getElementById('app_frame');
-        if (frame && frame.contentWindow) {
-            frame.contentWindow.postMessage({
-                tipo:  'VENTA_OFFLINE',
-                venta: ventaObj
-            }, '*');
-        }
+        // 3. Restauramos el sistema después de 3 segundos
+        setTimeout(() => {
+            location.reload(); 
+        }, 3000);
     }
-    </script>
+});
+        
+</script>
 </body>
 </html>
