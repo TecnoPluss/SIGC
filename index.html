@@ -2,30 +2,48 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TecnoPlus | SIGC</title>
     <!-- Fuente Inter - La más profesional para Software -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png">
     
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
         :root {
             --primary: #004687;
             --accent: #00a8e8;
             --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; font-family: 'Inter', sans-serif;
+        body {
             background: var(--bg-gradient);
         }
         
         /* Contenedor de Carga Estilo Moderno */
         #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; z-index: 9999;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
             background: var(--bg-gradient);
         }
 
@@ -39,8 +57,16 @@
             text-align: center;
         }
 
+        @media (max-width: 480px) {
+            .loader-card {
+                padding: 30px 25px;
+                width: 85%;
+            }
+        }
+
         .logo {
-            width: 130px; margin-bottom: 25px;
+            width: 130px;
+            margin-bottom: 25px;
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
             animation: pulse 2s infinite ease-in-out;
         }
@@ -53,7 +79,8 @@
 
         /* Barra de progreso elegante */
         .progress-container {
-            width: 200px; height: 6px;
+            width: 200px;
+            height: 6px;
             background: rgba(0,0,0,0.05);
             border-radius: 10px;
             margin: 20px auto;
@@ -61,7 +88,8 @@
         }
 
         .progress-bar {
-            width: 0%; height: 100%;
+            width: 0%;
+            height: 100%;
             background: linear-gradient(90deg, var(--primary), var(--accent));
             border-radius: 10px;
             animation: load 3s ease-in-out forwards;
@@ -73,19 +101,23 @@
         }
 
         #msg {
-            color: #444; font-size: 14px; font-weight: 500;
-            margin: 0; letter-spacing: 0.5px;
+            color: #444;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0;
+            letter-spacing: 0.5px;
         }
 
-        /* Iframe con compensación para ocultar franja de Google */
+        /* Iframe - ocupa toda la pantalla sin barra de Google */
         iframe {
             position: fixed;
-            top: 0; /* Mantiene la franja oculta */
+            top: 0;
             left: 0;
-            width: 100%;
-            height: calc(100%);
+            width: 100vw;
+            height: 100vh;
             border: none;
             display: none;
+            overflow: hidden;
         }
 
         .error-msg { color: #d32f2f; font-weight: 600; }
@@ -105,7 +137,12 @@
         </div>
     </div>
 
-    <iframe id="app_frame" src="" allow="geolocation; microphone; camera; clipboard-write;"></iframe>
+    <iframe 
+        id="app_frame" 
+        src="" 
+        allow="geolocation; microphone; camera; clipboard-write;"
+        scrolling="yes">
+    </iframe>
 
     <script>
     async function bootstrap() {
@@ -126,7 +163,18 @@
 
             if (cliente && cliente.s === "ACTIVA") {
                 const frame = document.getElementById('app_frame');
+
+                // Aplicar estilos para que el iframe ocupe toda la pantalla
+                frame.style.position = 'fixed';
+                frame.style.top = '0';
+                frame.style.left = '0';
+                frame.style.width = '100vw';
+                frame.style.height = '100vh';
+                frame.style.border = 'none';
+                frame.style.overflow = 'hidden';
+
                 frame.src = cliente.u; // Cargamos la URL del /exec
+
                 frame.onload = () => {
                     setTimeout(() => {
                         frame.style.display = "block";
@@ -145,6 +193,6 @@
     }
 
     bootstrap();
-</script>
+    </script>
 </body>
 </html>
