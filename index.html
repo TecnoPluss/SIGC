@@ -109,40 +109,13 @@
         }
 
         /* Iframe - ocupa toda la pantalla sin barra de Google */
-        iframe {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            border: none;
-            display: none;
-            overflow: hidden;
-        }
-
-        .error-msg { color: #d32f2f; font-weight: 600; }
-    </style>
-</head>
-<body>
-
-    <div id="loader">
-        <div class="loader-card">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN-_QvsMG51PzykustQRLBBmxyXzSE-ouzmSovei9czEj9MNhKOkWYrXxWhIbisAz_j837hHT25IK8IwB86SZfVQIEK_hrnyLcBXTQz07YkEyoCfRuW38KQgKwgB7BuLXdGL2gqTwiukZJRtp0cQQ6sursFkVlPi_RCTpRgQQ8XRrKlnOk1sHEcoSoiBU/s320/ssss-removebg-preview.png" class="logo">
-            
-            <p id="msg">Iniciando TecnoPlus SIGC...</p>
-            
-            <div class="progress-container">
-                <div class="progress-bar"></div>
-            </div>
-        </div>
-    </div>
-
-    <iframe 
-        id="app_frame" 
-        src="" 
-        allow="geolocation; microphone; camera; clipboard-write;"
-        scrolling="yes">
-    </iframe>
+        <iframe 
+    id="app_frame" 
+    src="" 
+    allow="geolocation; microphone; camera; clipboard-write; serial; usb;"
+    sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-forms allow-popups"
+    scrolling="yes">
+</iframe>
 
     <script>
     async function bootstrap() {
