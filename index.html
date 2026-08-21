@@ -138,11 +138,12 @@
     </div>
 
     <iframe 
-        id="app_frame" 
-        src="" 
-        allow="geolocation; microphone; camera; clipboard-write;"
-        scrolling="yes">
-    </iframe>
+    id="app_frame" 
+    src="" 
+    allow="geolocation; microphone; camera; clipboard-write; display-capture"
+    sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-scripts allow-same-origin allow-downloads"
+    style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; border: none; overflow: hidden;">
+</iframe>
 
     <script>
     async function bootstrap() {
